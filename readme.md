@@ -45,3 +45,5 @@ python main.py
 ## Reference
 
 - [MyGo Line bot project](https://hackmd.io/@StevenShih-0402/mygorobot)
+- [line login](https://account.line.biz/)
+- [Render](https://dashboard.render.com/)

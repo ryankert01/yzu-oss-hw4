@@ -65,7 +65,7 @@ def handle_message(event):
     elif text == "影片":
         # **Use VideoMessage in v3** (not VideoSendMessage)
         message = VideoMessage(
-            original_content_url="https://drive.google.com/file/d/1pg7YvWIYl1Vl12AQgM04Q66yB_H3ymVV/view",
+            original_content_url="https://ryankert01.github.io/yzu-oss-hw4/video.mp4",
             preview_image_url="https://static01.nyt.com/images/2025/05/03/multimedia/03biz-berkshire-file-ckmj/03biz-berkshire-file-ckmj-articleLarge.jpg"
         )
 

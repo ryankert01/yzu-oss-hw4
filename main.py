@@ -58,8 +58,8 @@ def handle_message(event):
     elif text == "圖片":
         # **Use ImageMessage in v3** (not ImageSendMessage)
         message = ImageMessage(
-            original_content_url="https://avatars.githubusercontent.com/u/91534261?v=4",
-            preview_image_url="https://avatars.githubusercontent.com/u/91534261?v=4"
+            original_content_url="https://ryankert01.github.io/yzu-oss-hw4/image.png",
+            preview_image_url="https://ryankert01.github.io/yzu-oss-hw4/image.png"
         )
 
     elif text == "影片":

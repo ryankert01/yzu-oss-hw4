@@ -66,7 +66,7 @@ def handle_message(event):
         # **Use VideoMessage in v3** (not VideoSendMessage)
         message = VideoMessage(
             original_content_url="https://ryankert01.github.io/yzu-oss-hw4/video.mp4",
-            preview_image_url="https://static01.nyt.com/images/2025/05/03/multimedia/03biz-berkshire-file-ckmj/03biz-berkshire-file-ckmj-articleLarge.jpg"
+            preview_image_url="https://ryankert01.github.io/yzu-oss-hw4/video_preview.png"
         )
 
     elif text == "位置資訊":
@@ -90,7 +90,7 @@ def handle_message(event):
 
     else:
         message = TextMessage(
-            text="請輸入：文字、貼圖、圖片、影片 或 位置資訊 來測試不同回覆。"
+            text="請輸入：文字、貼圖、圖片、影片、位置資訊 或 mygo:<動漫圖搜尋詞> 來測試不同回覆。"
         )
 
     # Send the reply via v3 MessagingApi

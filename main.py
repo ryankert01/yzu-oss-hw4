@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
@@ -17,20 +17,73 @@ from linebot.v3.messaging import (
 )
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 
+import google.generativeai as genai
+import json
+from datetime import datetime
+import uuid
+
 # ─── Load config ────────────────────────────────────────────────────────────────
 load_dotenv()
 CHANNEL_ACCESS_TOKEN = os.getenv("CHANNEL_ACCESS_TOKEN")
 CHANNEL_SECRET       = os.getenv("CHANNEL_SECRET")
+GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Initialize v3 SDK client configuration
 configuration = Configuration(access_token=CHANNEL_ACCESS_TOKEN)
 handler       = WebhookHandler(CHANNEL_SECRET)
+
+# Add this after other environment variables
+genai.configure(api_key=GOOGLE_API_KEY)
+
+# Initialize Gemini model
+model = genai.GenerativeModel('gemini-2.0-flash')
 
 app = Flask(__name__)
 
 # Your custom image search handler (unchanged)
 from utils import MyGoImage
 mygo = MyGoImage("./mygo_db.json")
+
+# Add after other initializations
+CONVERSATION_FILE = "conversations.json"
+
+def load_conversations():
+    try:
+        with open(CONVERSATION_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+def save_conversations(conversations):
+    with open(CONVERSATION_FILE, 'w', encoding='utf-8') as f:
+        json.dump(conversations, f, ensure_ascii=False, indent=2)
+
+# Add these new routes before the callback route
+@app.route("/api/conversations", methods=["GET"])
+def get_all_conversations():
+    conversations = load_conversations()
+    return jsonify(conversations)
+
+@app.route("/api/conversations/<conversation_id>", methods=["GET"])
+def get_conversation(conversation_id):
+    conversations = load_conversations()
+    if conversation_id in conversations:
+        return jsonify(conversations[conversation_id])
+    return jsonify({"error": "Conversation not found"}), 404
+
+@app.route("/api/conversations", methods=["DELETE"])
+def delete_all_conversations():
+    save_conversations({})
+    return jsonify({"message": "All conversations deleted"})
+
+@app.route("/api/conversations/<conversation_id>", methods=["DELETE"])
+def delete_conversation(conversation_id):
+    conversations = load_conversations()
+    if conversation_id in conversations:
+        del conversations[conversation_id]
+        save_conversations(conversations)
+        return jsonify({"message": f"Conversation {conversation_id} deleted"})
+    return jsonify({"error": "Conversation not found"}), 404
 
 # ─── Webhook endpoint ──────────────────────────────────────────────────────────
 @app.route("/callback", methods=["POST"])
@@ -47,8 +100,24 @@ def callback():
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     text = event.message.text.strip().lower()
+    user_id = event.source.user_id
+    conversations = load_conversations()
+    
+    # Initialize user's conversation history if it doesn't exist
+    if user_id not in conversations:
+        conversations[user_id] = {
+            "messages": [],
+            "created_at": datetime.now().isoformat()
+        }
+    
+    # Store the user's message
+    conversations[user_id]["messages"].append({
+        "role": "user",
+        "content": text,
+        "timestamp": datetime.now().isoformat()
+    })
 
-    # Choose reply based on the user’s text
+    # Choose reply based on the user's text
     if text == "文字":
         message = TextMessage(text="這是一則文字回覆！")
 
@@ -89,9 +158,28 @@ def handle_message(event):
             message = TextMessage(text="找不到圖片wwwwwwwww")
 
     else:
-        message = TextMessage(
-            text="請輸入：文字、貼圖、圖片、影片、位置資訊 或 mygo:<動漫圖搜尋詞> 來測試不同回覆。"
-        )
+        try:
+            # Get the prompt after "ai:"
+            prompt = text.strip()
+            
+            # Call Gemini API
+            response = model.generate_content(prompt)
+            
+            # Get the response text
+            ai_response = response.text
+            
+            message = TextMessage(text=ai_response)
+        except Exception as e:
+            message = TextMessage(text=f"抱歉，AI 回應時發生錯誤: {str(e)}")
+
+    # Store the bot's response
+    conversations[user_id]["messages"].append({
+        "role": "assistant",
+        "content": message.text if isinstance(message, TextMessage) else "Non-text response",
+        "timestamp": datetime.now().isoformat()
+    })
+    
+    save_conversations(conversations)
 
     # Send the reply via v3 MessagingApi
     with ApiClient(configuration) as api_client:

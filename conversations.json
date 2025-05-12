@@ -1,0 +1,57 @@
+{
+  "U0c20c03b3f90d27d648c70931740f296": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "文字",
+        "timestamp": "2025-05-12T13:36:13.867911"
+      },
+      {
+        "role": "assistant",
+        "content": "這是一則文字回覆！",
+        "timestamp": "2025-05-12T13:36:13.867996"
+      },
+      {
+        "role": "user",
+        "content": "貼圖",
+        "timestamp": "2025-05-12T13:36:21.651625"
+      },
+      {
+        "role": "assistant",
+        "content": "Non-text response",
+        "timestamp": "2025-05-12T13:36:21.651769"
+      },
+      {
+        "role": "user",
+        "content": "圖片",
+        "timestamp": "2025-05-12T13:36:24.819827"
+      },
+      {
+        "role": "assistant",
+        "content": "Non-text response",
+        "timestamp": "2025-05-12T13:36:24.820154"
+      },
+      {
+        "role": "user",
+        "content": "影片",
+        "timestamp": "2025-05-12T13:36:28.347787"
+      },
+      {
+        "role": "assistant",
+        "content": "Non-text response",
+        "timestamp": "2025-05-12T13:36:28.347933"
+      },
+      {
+        "role": "user",
+        "content": "位置資訊",
+        "timestamp": "2025-05-12T13:36:33.495779"
+      },
+      {
+        "role": "assistant",
+        "content": "Non-text response",
+        "timestamp": "2025-05-12T13:36:33.495986"
+      }
+    ],
+    "created_at": "2025-05-12T13:36:13.867872"
+  }
+}

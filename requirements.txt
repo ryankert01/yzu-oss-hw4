@@ -2,3 +2,5 @@ Flask==3.1.0
 python-dotenv==1.1.0
 line-bot-sdk==3.17.1
 gunicorn
+dotenv
+google-generativeai==0.3.2
